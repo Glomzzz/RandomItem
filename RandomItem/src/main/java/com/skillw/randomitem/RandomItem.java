@@ -9,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -34,21 +33,17 @@ public class RandomItem {
     private final Material material;
     private final List<String> lores;
     private final HashMap<String, Object> nbtHashMap;
-    private final boolean isUnbreakable;
-    private final boolean isHideAttribute;
     private final ItemCompute itemCompute;
     private final ConcurrentHashMap<String, List<String>> stringsMap;
     private final ConcurrentHashMap<String, String> numbersMap;
     private final String display;
 
-    public RandomItem(String id, String display, Material material, List<String> lores, HashMap<String, Object> nbtHashMap, boolean isUnbreakable, boolean isHideAttribute, ItemCompute itemCompute, ConcurrentHashMap<String, List<String>> stringsMap, ConcurrentHashMap<String, String> numbersMap) {
+    public RandomItem(String id, String display, Material material, List<String> lores, HashMap<String, Object> nbtHashMap, ItemCompute itemCompute, ConcurrentHashMap<String, List<String>> stringsMap, ConcurrentHashMap<String, String> numbersMap) {
         this.id = id;
         this.display = display;
         this.material = material;
         this.lores = lores;
         this.nbtHashMap = nbtHashMap;
-        this.isUnbreakable = isUnbreakable;
-        this.isHideAttribute = isHideAttribute;
         this.itemCompute = itemCompute;
         this.stringsMap = stringsMap;
         this.numbersMap = numbersMap;
@@ -85,8 +80,6 @@ public class RandomItem {
             itemKeyS.createSection("material");
             itemKeyS.createSection("data");
             itemKeyS.createSection("display");
-            itemKeyS.createSection("unbreakable");
-            itemKeyS.createSection("hide-attribute");
             itemKeyS.createSection("lores");
             itemKeyS.createSection("nbt-keys");
             itemKeyS.createSection("randoms");
@@ -94,8 +87,6 @@ public class RandomItem {
             itemKeyS.set("material", material.toString());
             itemKeyS.set("data", sh);
             itemKeyS.set("display", name);
-            itemKeyS.set("unbreakable", itemMeta.isUnbreakable());
-            itemKeyS.set("hide-attribute", itemMeta.getItemFlags().contains(ItemFlag.HIDE_ATTRIBUTES));
             itemKeyS.set("lores", lores);
             NBTItem nbtItem = new NBTItem(itemStack);
             for (String key : nbtItem.getKeys()) {
@@ -124,8 +115,6 @@ public class RandomItem {
                 ConfigurationSection objectSection = config.getConfigurationSection(key);
                 Material material = Material.matchMaterial(objectSection.getString("material"));
                 String display = objectSection.getString(("display"));
-                boolean unbreakable = objectSection.getBoolean(("unbreakable"));
-                boolean hideAttribute = objectSection.getBoolean(("hide-attribute"));
                 List<String> lores = objectSection.getStringList(("lores"));
                 ConfigurationSection nbtSection = objectSection.getConfigurationSection("nbt-keys");
                 HashMap<String, Object> objectHashmap = new HashMap<>();
@@ -142,7 +131,7 @@ public class RandomItem {
                     loadRandom(stringsMap, numbersMap, randomsSection);
                 }
                 itemCompute.setRandomMap(numbersMap);
-                RandomItem main = new RandomItem(key, display, material, lores, objectHashmap, unbreakable, hideAttribute, itemCompute, stringsMap, numbersMap);
+                RandomItem main = new RandomItem(key, display, material, lores, objectHashmap, itemCompute, stringsMap, numbersMap);
                 RandomItem.getRPGItemHashMap().put(key, main);
             }
         }
@@ -152,20 +141,6 @@ public class RandomItem {
         {
             ItemStack itemStack = new ItemStack(this.material, 1);
             ItemMeta im = itemStack.getItemMeta();
-            if (this.isUnbreakable) {
-                try {
-                    im.setUnbreakable(true);
-                } catch (Exception ignored) {
-
-                }
-            }
-
-            if (this.isHideAttribute) {
-                try {
-                    im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                } catch (Exception ignored) {
-                }
-            }
 
             im.setDisplayName(getMessage(this.display));
             List<String> newLores = new ArrayList<>();
@@ -187,20 +162,6 @@ public class RandomItem {
     public ItemStack getItemStack(Player player) {
         ItemStack itemStack = new ItemStack(material, 1);
         ItemMeta im = itemStack.getItemMeta();
-        if (isUnbreakable) {
-            try {
-                im.setUnbreakable(true);
-            } catch (Exception ignored) {
-
-            }
-        }
-
-        if (isHideAttribute) {
-            try {
-                im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-            } catch (Exception ignored) {
-            }
-        }
         String display = new String(this.display);
         ConcurrentHashMap<String, String> numbersMap = new ConcurrentHashMap<>();
         for (String key : this.numbersMap.keySet()) {
@@ -304,14 +265,6 @@ public class RandomItem {
 
     public HashMap<String, Object> getNBTHashMap() {
         return this.nbtHashMap;
-    }
-
-    public boolean isUnbreakable() {
-        return this.isUnbreakable;
-    }
-
-    public boolean isHideAttribute() {
-        return this.isHideAttribute;
     }
 
     public ItemCompute getItemCompute() {
