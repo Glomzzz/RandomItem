@@ -1,8 +1,6 @@
 ExampleItem:
   display: '<前缀词.0>&3村好剑♂'
   material: 'IRON_SWORD'
-  unbreakable: false
-  hide-attribute: false
   lores:
     - '<前缀词.1-3>'
     - '&f_______&b<-&8基础属性&b->>&f_______'
