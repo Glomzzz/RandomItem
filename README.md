@@ -8,7 +8,7 @@ MCBBS: https://www.mcbbs.net/thread-1156871-1-1.html
 
 SpigotMC: https://www.spigotmc.org/resources/randomitem.88226/
 
-depends:
+Depends:
 
   NBTAPI: https://www.spigotmc.org/resources/nbt-api.7939/
 
