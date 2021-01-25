@@ -64,9 +64,17 @@ public class RandomItemUtils {
      * @param msg 文本
      * @return 替换后的文本
      */
-    public static String getMessage(final String msg) {
+    public static String getMessage(String msg) {
         if (msg != null) {
             return msg.replace("&", "§");
+        } else {
+            return msg;
+        }
+    }
+
+    public static String messageToOriginalText(String msg) {
+        if (msg != null) {
+            return msg.replace("§", "&");
         } else {
             return msg;
         }
