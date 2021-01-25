@@ -19,8 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.skillw.randomitem.utils.RandomItemUtils.getMessage;
-import static com.skillw.randomitem.utils.RandomItemUtils.loadRandom;
+import static com.skillw.randomitem.utils.RandomItemUtils.*;
 
 /**
  * @author Glom_
@@ -65,36 +64,58 @@ public class RandomItem {
 
     public static void createItemStackConfig(ItemStack itemStack, String itemKey) {
         try {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            String name = itemMeta.getDisplayName();
-            Material material = itemStack.getType();
-            short sh = (short) itemMeta.getCustomModelData();
-            List<String> lores = itemMeta.getLore();
-            File file = new File(Main.getInstance().getDataFolder() + "/Items", itemKey + ".yml");
-            if (!file.createNewFile()) {
-                return;
+            if (itemStack.hasItemMeta()) {
+                ItemMeta itemMeta = itemStack.getItemMeta();
+
+                Material material = itemStack.getType();
+
+                String name = (itemMeta.hasDisplayName()) ? messageToOriginalText(itemMeta.getDisplayName()) : material.name();
+
+                List<String> lores = new ArrayList<>();
+                if (itemMeta.hasLore()) {
+                    for (String lore : itemMeta.getLore()) {
+                        lores.add(messageToOriginalText(lore));
+                    }
+                }
+
+                short customModelData = 0;
+                if (itemMeta.hasCustomModelData()) {
+                    customModelData = (short) itemMeta.getCustomModelData();
+                }
+
+                File file = new File(Main.getInstance().getDataFolder() + "/Items", itemKey + ".yml");
+                if (!file.createNewFile()) {
+                    return;
+                }
+                YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                config.createSection(itemKey);
+                ConfigurationSection itemKeySection = config.getConfigurationSection(itemKey);
+                itemKeySection.createSection("material");
+                itemKeySection.createSection("data");
+                itemKeySection.createSection("display");
+                itemKeySection.createSection("lores");
+                itemKeySection.createSection("nbt-keys");
+                itemKeySection.createSection("randoms");
+                itemKeySection.createSection("computes");
+                itemKeySection.set("material", material.toString());
+                itemKeySection.set("data", customModelData);
+                itemKeySection.set("display", name);
+                itemKeySection.set("lores", lores);
+                NBTItem nbtItem = new NBTItem(itemStack);
+                for (String key : nbtItem.getKeys()) {
+                    if (!(key.equals("Damage") || key.equals("display"))) {
+                        if (nbtItem.getString(key) != null && !nbtItem.getString(key).isEmpty()) {
+                            itemKeySection.getConfigurationSection("nbt-keys").set(key, nbtItem.getString(key));
+                        } else if (nbtItem.getDouble(key) != null) {
+                            itemKeySection.getConfigurationSection("nbt-keys").set(key, nbtItem.getDouble(key));
+                        } else if (nbtItem.getInteger(key) != null) {
+                            itemKeySection.getConfigurationSection("nbt-keys").set(key, nbtItem.getInteger(key));
+                        }
+                    }
+                }
+                config.save(file);
+                Main.getInstance().loadConfig();
             }
-            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-            config.createSection(itemKey);
-            ConfigurationSection itemKeyS = config.getConfigurationSection(itemKey);
-            itemKeyS.createSection("material");
-            itemKeyS.createSection("data");
-            itemKeyS.createSection("display");
-            itemKeyS.createSection("lores");
-            itemKeyS.createSection("nbt-keys");
-            itemKeyS.createSection("randoms");
-            itemKeyS.createSection("computes");
-            itemKeyS.set("material", material.toString());
-            itemKeyS.set("data", sh);
-            itemKeyS.set("display", name);
-            itemKeyS.set("lores", lores);
-            NBTItem nbtItem = new NBTItem(itemStack);
-            for (String key : nbtItem.getKeys()) {
-                Object object = nbtItem.getObject(key, Object.class);
-                itemKeyS.getConfigurationSection("nbt-keys").set(key, object);
-            }
-            config.save(file);
-            Main.getInstance().loadConfig();
         } catch (Exception e) {
             e.printStackTrace();
         }
