@@ -39,8 +39,9 @@ public class RandomItem {
     private final ConcurrentHashMap<String, String> numbersMap;
     private final ConcurrentHashMap<String, String> enchantsMap;
     private final String display;
+    private final short data;
 
-    public RandomItem(String id, String display, String material, List<String> lores, HashMap<String, String> nbtHashMap, ItemCompute itemCompute, ConcurrentHashMap<String, List<String>> stringsMap, ConcurrentHashMap<String, String> numbersMap, ConcurrentHashMap<String, String> enchantsMap) {
+    public RandomItem(String id, String display, String material, List<String> lores, HashMap<String, String> nbtHashMap, ItemCompute itemCompute, ConcurrentHashMap<String, List<String>> stringsMap, ConcurrentHashMap<String, String> numbersMap, ConcurrentHashMap<String, String> enchantsMap, short data) {
         this.id = id;
         this.display = display;
         this.material = material;
@@ -50,12 +51,12 @@ public class RandomItem {
         this.stringsMap = stringsMap;
         this.numbersMap = numbersMap;
         this.enchantsMap = enchantsMap;
+        this.data = data;
     }
 
     public synchronized static HashMap<String, RandomItem> getRPGItemHashMap() {
         return RandomItem.RPG_ITEM_HASH_MAP;
     }
-
 
     public static ItemStack getItemStack(String itemID, Player player) {
         RandomItem randomItem = RandomItem.getRPGItemHashMap().get(itemID);
@@ -78,10 +79,14 @@ public class RandomItem {
                     }
                 }
 
-                /*short customModelData = 0;
-                if (itemMeta.hasCustomModelData()) {
-                    customModelData = (short) itemMeta.getCustomModelData();
-                }*/
+                short data = 0;
+                if (Main.version > 1141) {
+                    if (itemMeta.hasCustomModelData()) {
+                        data = (short) itemMeta.getCustomModelData();
+                    }
+                } else {
+                    data = (short) itemStack.getData().getData();
+                }
 
                 File file = new File(Main.getInstance().getDataFolder() + "/Items", itemKey + ".yml");
                 if (!file.createNewFile()) {
@@ -91,7 +96,7 @@ public class RandomItem {
                 config.createSection(itemKey);
                 ConfigurationSection itemKeySection = config.getConfigurationSection(itemKey);
                 itemKeySection.createSection("material");
-                /* itemKeySection.createSection("data");*/
+                itemKeySection.createSection("data");
                 itemKeySection.createSection("display");
                 itemKeySection.createSection("lores");
                 itemKeySection.createSection("nbt-keys");
@@ -99,7 +104,7 @@ public class RandomItem {
                 itemKeySection.createSection("randoms");
                 itemKeySection.createSection("computes");
                 itemKeySection.set("material", material.toString());
-                /*itemKeySection.set("data", customModelData);*/
+                itemKeySection.set("data", data);
                 itemKeySection.set("display", name);
                 itemKeySection.set("lores", lores);
                 NBTItem nbtItem = new NBTItem(itemStack);
@@ -150,6 +155,8 @@ public class RandomItem {
 
                 List<String> lores = objectSection.getStringList(("lores"));
 
+                short data = (short) objectSection.getInt("data");
+
                 ConfigurationSection nbtSection = objectSection.getConfigurationSection("nbt-keys");
                 HashMap<String, String> nbtHashMap = new HashMap<>();
                 if (nbtSection != null && !nbtSection.getKeys(false).isEmpty()) {
@@ -174,10 +181,14 @@ public class RandomItem {
                     loadRandom(stringsMap, numbersMap, randomsSection);
                 }
                 itemCompute.setRandomMap(numbersMap);
-                RandomItem randomItem = new RandomItem(key, display, material, lores, nbtHashMap, itemCompute, stringsMap, numbersMap, enchantsMap);
+                RandomItem randomItem = new RandomItem(key, display, material, lores, nbtHashMap, itemCompute, stringsMap, numbersMap, enchantsMap, data);
                 RandomItem.getRPGItemHashMap().put(key, randomItem);
             }
         }
+    }
+
+    public short getData() {
+        return data;
     }
 
     public ConcurrentHashMap<String, String> getEnchantsMap() {
@@ -244,9 +255,15 @@ public class RandomItem {
     }
 
     public ItemStack getItemStack(Player player) {
-        ItemStack itemStack = new ItemStack(Material.IRON_AXE, 1);
+        ItemStack itemStack;
+        if (Main.version > 1121) {
+            itemStack = new ItemStack(Material.IRON_AXE, 1);
+        } else {
+            itemStack = new ItemStack(Material.IRON_AXE, 1, data);
+        }
+
         ItemMeta itemMeta = itemStack.getItemMeta();
-        String display = new String(this.display);
+        String display = new String((this.display == null) ? material : this.display);
         ConcurrentHashMap<String, String> numbersMap = new ConcurrentHashMap<>();
         for (String key : this.numbersMap.keySet()) {
             String value = PlaceholderAPI.setPlaceholders(player, this.numbersMap.get(key));
@@ -262,6 +279,9 @@ public class RandomItem {
         itemStack.setType(material);
         display = doReplace(display, computeMap, numbersMap, alreadyStringsMap, player);
         itemMeta.setDisplayName(display);
+        if (Main.version >= 1141) {
+            itemMeta.setCustomModelData(Integer.valueOf(data));
+        }
         List<String> newLores = new ArrayList<>();
         List<String> loresClone = new ArrayList<>();
         for (String lore : lores) {
