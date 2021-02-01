@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Glom_
  */
 public final class Main extends JavaPlugin {
+    public static int version;
     private static Main instance;
     int pluginId = 10031;
     private File configFile;
@@ -84,6 +85,7 @@ public final class Main extends JavaPlugin {
     }
 
     private void firstLoad() {
+        version = Integer.parseInt(Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3].replace("v", "").replace("_", "").replace("R", ""));
         this.configFile = new File(getDataFolder(), "Config.yml");
         this.config = YamlConfiguration.loadConfiguration(this.configFile);
         this.messageFile = new File(getDataFolder(), "Message.yml");
