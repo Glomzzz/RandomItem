@@ -25,6 +25,7 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.skillw.randomitem.Main.sendDebug;
@@ -35,6 +36,7 @@ import static com.skillw.randomitem.utils.ConfigUtils.getPrefix;
  * @author Glom_
  */
 public class RandomItemUtils {
+    private static final Pattern PATTERN2 = Pattern.compile("(<[^>]*>)");
     protected static Pattern PATTERN = Pattern.compile("\\d+s");
     private static boolean isRightFormat = true;
 
@@ -583,6 +585,16 @@ public class RandomItemUtils {
         return value;
     }
 
+    public static List<String> extractMessageByTriangularBrackets(String msg) {
+
+        List<String> list = new ArrayList<>();
+        Matcher m = PATTERN2.matcher(msg);
+        while (m.find()) {
+            list.add(m.group().substring(1, m.group().length() - 1));
+        }
+        return list;
+    }
+
     /**
      * To get the List of the strings between "<" and ">"
      *
@@ -590,25 +602,7 @@ public class RandomItemUtils {
      * @return the List of the strings between "<" and ">"
      */
     public static List<String> intercept(String text) {
-        ArrayList<String> strings = new ArrayList<>();
-        int left = 0, right;
-        int count = 0;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '<') {
-                if (count == 0) {
-                    left = i;
-                }
-                count++;
-            }
-            if (text.charAt(i) == '>') {
-                count--;
-                if (count == 0) {
-                    right = i;
-                    strings.add(text.substring(left + 1, right));
-                }
-            }
-        }
-        return strings;
+        return extractMessageByTriangularBrackets(text);
     }
 
     public static String handleReplaced(String replaced, ComplexData data) {
