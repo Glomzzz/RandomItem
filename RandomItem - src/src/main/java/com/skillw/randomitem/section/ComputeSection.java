@@ -40,7 +40,7 @@ public class ComputeSection extends BaseSection implements Debuggable {
         int fixed = (int) (RandomItemUtils.getResult(value.split(",")[1]));
         String formula = value.split(",")[2];
         double doubleResult = RandomItemUtils.getResult(formula);
-        String result = String.valueOf(RandomItemUtils.format(Math.min(max, doubleResult), fixed));
+        String result = String.valueOf(fixed == 0 ? Math.round(Math.min(max, doubleResult)) : RandomItemUtils.format(Math.min(max, doubleResult), fixed));
         alreadySectionMap.put(this.getId(), Arrays.asList(result));
         return result;
     }
