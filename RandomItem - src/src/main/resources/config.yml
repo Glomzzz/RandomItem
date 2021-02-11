@@ -1,0 +1,9 @@
+#don't change this!!!!!!!!!
+version: 210
+options:
+  debug: false
+command:
+  name: 'randomitem'
+  aliases:
+    - 'ri'
+  permission: 'randomitem.admin'
