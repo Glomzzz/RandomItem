@@ -39,7 +39,7 @@ public class NumberSection extends BaseSection implements Debuggable {
         double start = (RandomItemUtils.getResult(value.split(",")[0]));
         double bound = (RandomItemUtils.getResult(value.split(",")[1]));
         int fixed = Integer.parseInt(value.split(",")[2]);
-        String result = String.valueOf(RandomItemUtils.getRandom(start, bound, fixed));
+        String result = String.valueOf(fixed == 0 ? RandomItemUtils.getRandom((int) Math.round(start), (int) Math.round(bound)) : RandomItemUtils.getRandom(start, bound, fixed));
         alreadySectionMap.put(this.getId(), Arrays.asList(result));
         return result;
     }
