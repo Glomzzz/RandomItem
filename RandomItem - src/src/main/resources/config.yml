@@ -2,6 +2,7 @@
 version: 210
 options:
   debug: false
+  check-version: true
 command:
   name: 'randomitem'
   aliases:
