@@ -222,9 +222,6 @@ public class RandomItemUtils {
      * @return A random double
      */
     public static double getRandom(double start, double end, int fixed) {
-        if (fixed == 0) {
-            return getRandom((int) start, (int) end);
-        }
         if ((start > end)) {
             return Math.max(start, 0);
         } else {
