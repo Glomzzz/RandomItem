@@ -23,6 +23,10 @@ public class ConfigUtils {
         return GLOBAL_SECTION_MAP;
     }
 
+    public static boolean isCheckVersion() {
+        return Main.getInstance().getConfig().getBoolean("options.check-version");
+    }
+
     public static void loadGlobalSection() {
         getGlobalSectionMap().clear();
         ConcurrentHashMap<String, BaseSection> sectionMap = new ConcurrentHashMap<>();
