@@ -23,7 +23,7 @@ public class NumberSection extends BaseSection implements Debuggable {
         super(id, new NumberType(), new HashMap<String, Object>() {{
             this.put("start", start);
             this.put("bound", bound);
-            this.put("fixed", fixed == null ? 0 : fixed);
+            this.put("fixed", fixed == null ? "0" : fixed);
         }});
     }
 
@@ -38,8 +38,13 @@ public class NumberSection extends BaseSection implements Debuggable {
         value = RandomItemUtils.handleStringReplaced(value, data);
         double start = (RandomItemUtils.getResult(value.split(",")[0]));
         double bound = (RandomItemUtils.getResult(value.split(",")[1]));
-        int fixed = Integer.parseInt(value.split(",")[2]);
-        String result = String.valueOf(fixed == 0 ? RandomItemUtils.getRandom((int) Math.round(start), (int) Math.round(bound)) : RandomItemUtils.getRandom(start, bound, fixed));
+        int fixed = (int) RandomItemUtils.getResult(value.split(",")[2]);
+        String result;
+        if (fixed == 0) {
+            result = String.valueOf(RandomItemUtils.getRandom((int) Math.round(start), (int) Math.round(bound)));
+        } else {
+            result = String.valueOf(RandomItemUtils.getRandom(start, bound, fixed));
+        }
         alreadySectionMap.put(this.getId(), Arrays.asList(result));
         return result;
     }
