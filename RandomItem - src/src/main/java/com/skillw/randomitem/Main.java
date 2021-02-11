@@ -349,17 +349,20 @@ public final class Main extends Plugin {
     }
 
     private void checkVersion() {
+        if (!isCheckVersion()) {
+            return;
+        }
         int newestVersion = RandomItemUtils.getNewestVersion();
         String newestVersionString = String.valueOf(newestVersion);
         if (ConfigUtils.getVersion() < newestVersion) {
-            StringBuffer stringBuffer = new StringBuffer();
+            StringBuilder stringBuffer = new StringBuilder();
             for (int i = 0; i < newestVersionString.length(); i++) {
                 stringBuffer.append(newestVersionString.charAt(i));
                 if (i < newestVersionString.length() - 1) {
                     stringBuffer.append(".");
                 }
             }
-            sendMessage(getPrefix() + "&cRandomitem has a new version &6" + stringBuffer.toString() + "&c, please go to&e https://www.spigotmc.org/resources/%E2%9C%85randomitem%E2%9C%85%E2%80%94%E2%80%94a-random-plugin%E2%9A%9C%EF%B8%8F2-0-is-coming-%E2%AD%90-supports-nbt-enchantments.88226/ &cto download the latest version!");
+            sendMessage(getPrefix() + "&cRandomItem has a new version &6" + stringBuffer.toString() + "&c, please go to&e https://www.spigotmc.org/resources/%E2%9C%85randomitem%E2%9C%85%E2%80%94%E2%80%94a-random-plugin%E2%9A%9C%EF%B8%8F2-0-is-coming-%E2%AD%90-supports-nbt-enchantments.88226/ &cto download the latest version!");
         } else if (newestVersion != -114514) {
             sendMessage(getPrefix() + "&aYour RandomItem is the latest version!");
         }
