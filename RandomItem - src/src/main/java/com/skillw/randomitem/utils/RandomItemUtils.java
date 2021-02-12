@@ -25,7 +25,6 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.skillw.randomitem.Main.sendDebug;
@@ -278,7 +277,7 @@ public class RandomItemUtils {
             } else if (replace.contains(">.") && !replace.contains(".<")) {
                 numbers = replace.split(">\\.")[1];
             } else if (replace.contains(".<")) {
-                numbers = replace.split("\\.")[1];
+                numbers = "<" + replace.split("\\.<")[1];
             } else {
                 numbers = replace.split("\\.")[1];
             }
@@ -347,13 +346,20 @@ public class RandomItemUtils {
             if (sectionMap.containsKey(key)) {
                 continue;
             }
-            for (String neededKey : usedGlobalSection) {
-                if (key.equals(neededKey)) {
-                    BaseSection baseSection = globalSectionMap.get(key);
-                    debugSection(baseSection);
-                    sectionMap.put(key, baseSection);
+            if (usedGlobalSection == null) {
+                BaseSection baseSection = globalSectionMap.get(key);
+                debugSection(baseSection);
+                sectionMap.put(key, baseSection);
+            } else {
+                for (String neededKey : usedGlobalSection) {
+                    if (key.equals(neededKey)) {
+                        BaseSection baseSection = globalSectionMap.get(key);
+                        debugSection(baseSection);
+                        sectionMap.put(key, baseSection);
+                    }
                 }
             }
+
         }
     }
 
@@ -586,17 +592,7 @@ public class RandomItemUtils {
         return value;
     }
 
-    public static List<String> extractMessageByTriangularBrackets(String msg) {
-
-        List<String> list = new ArrayList<>();
-        Matcher m = PATTERN2.matcher(msg);
-        while (m.find()) {
-            list.add(m.group().substring(1, m.group().length() - 1));
-        }
-        return list;
-    }
-
-    public static List<String> interceptRedundant(String text) {
+    public static List<String> interceptRedundant1(String text) {
         ArrayList<String> strings = new ArrayList<>();
         int start = 0, end = 0;
         int count = 0;
@@ -618,6 +614,28 @@ public class RandomItemUtils {
         return strings;
     }
 
+    public static List<String> interceptRedundant2(String text) {
+        ArrayList<String> strings = new ArrayList<>();
+        int start = 0, end = 0;
+        int count = 0;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '\\') {
+                if (count == 0) {
+                    start = i;
+                }
+                count++;
+            }
+            if (text.charAt(i) == '/') {
+                count--;
+                if (count == 0) {
+                    end = i;
+                    strings.add(text.substring(start, end + 1));
+                }
+            }
+        }
+        return strings;
+    }
+
     /**
      * To get the List of the strings between "<" and ">"
      *
@@ -626,7 +644,11 @@ public class RandomItemUtils {
      */
     public static List<String> intercept(String text) {
         ArrayList<String> strings = new ArrayList<>();
-        for (String redundant : interceptRedundant(text)) {
+        for (String redundant : interceptRedundant1(text)) {
+            text = text.replace(redundant, "");
+        }
+        //For the fool...
+        for (String redundant : interceptRedundant2(text)) {
             text = text.replace(redundant, "");
         }
         int start = 0, end = 0;
@@ -656,24 +678,19 @@ public class RandomItemUtils {
         String otherKey;
         if (replaced.contains(".")) {
             if (replaced.split("\\.").length > 0) {
-                otherKey = replaced.split("\\.")[0];
-                if (otherKey.contains("<") && !otherKey.contains(">")) {
-                    otherKey = otherKey.split("<")[1];
-                    otherKey = handleStringReplaced(otherKey, data);
-                }
-                {
-                    if (!alreadySectionMap.containsKey(otherKey)) {
-                        BaseSection section = sectionMap.get(otherKey);
-                        if (section != null) {
-                            section.handleSection(replaced, data);
-                        }
+                otherKey = handleStringReplaced(replaced.split("\\.")[0], data);
+
+                if (!alreadySectionMap.containsKey(otherKey)) {
+                    BaseSection section = sectionMap.get(otherKey);
+                    if (section != null) {
+                        section.handleSection(replaced, data);
                     }
-                    List<String> stringList = alreadySectionMap.get(otherKey);
-                    if (checkNull(stringList, "Wrong section ID in " + replaced + "!")) {
-                        return replaced;
-                    }
-                    string = RandomItemUtils.listToStringWithNext(RandomItemUtils.getStrings(replaced, stringList, data));
                 }
+                List<String> stringList = alreadySectionMap.get(otherKey);
+                if (checkNull(stringList, "Wrong section ID in " + replaced + "!")) {
+                    return replaced;
+                }
+                string = RandomItemUtils.listToStringWithNext(RandomItemUtils.getStrings(replaced, stringList, data));
             }
         } else {
             if (sectionMap.containsKey(replaced)) {
