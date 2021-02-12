@@ -82,9 +82,7 @@ public class RandomItemApiImpl implements RandomItemApi {
                     debugSection(baseSection);
                 }
             }
-            if (usedGlobalSection != null) {
-                addGlobalRandom(sectionMap, usedGlobalSection);
-            }
+            addGlobalRandom(sectionMap, usedGlobalSection);
         }
         return this.createRandomItem(key, display, material, data, lores, usedGlobalSection, nbtSection, enchantmentMap, sectionMap);
     }
