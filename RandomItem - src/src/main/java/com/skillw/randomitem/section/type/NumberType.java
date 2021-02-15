@@ -25,10 +25,6 @@ public class NumberType extends BaseSectionType {
 
     @Override
     protected BaseSection loadFromSection(ConfigurationSection section) {
-        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
-        for (Player player : players) {
-
-        }
         if (section != null) {
             String start = section.getString("start");
             if (checkNull(start, "start can't be null!!")) {
