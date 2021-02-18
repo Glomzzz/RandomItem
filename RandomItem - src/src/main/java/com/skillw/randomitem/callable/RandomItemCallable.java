@@ -199,8 +199,8 @@ public final class RandomItemCallable implements Callable<ItemStack> {
         ItemStack itemStack = builder.build();
         if (this.getItemData().getNbtSection() != null && !this.getItemData().getNbtSection().getKeys(false).isEmpty()) {
             sendDebug("&d- &aFinal NBT-keys: ");
+            translateSection(NMS.handle().loadNBT(itemStack), this.getItemData().getNbtSection(), complexData).saveTo(itemStack);
         }
-        translateSection(NMS.handle().loadNBT(itemStack), this.getItemData().getNbtSection(), complexData).saveTo(itemStack);
         ConfigurationSection attributeSection = this.itemData.getAttributeSection();
         if (attributeSection != null) {
             NBTList nbtList = new NBTList();
