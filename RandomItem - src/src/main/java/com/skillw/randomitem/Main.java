@@ -152,7 +152,7 @@ public final class Main extends Plugin {
                                         Player p = (Player) sender;
                                         ItemStack itemStack = p.getInventory().getItemInMainHand();
                                         if (itemStack.getType() == AIR) {
-                                            sender.sendMessage(getValidSaveMessage("空气"));
+                                            sender.sendMessage(getValidSaveMessage("UNKNOWN"));
                                             break;
                                         }
                                         ItemMeta itemMeta = itemStack.getItemMeta();
