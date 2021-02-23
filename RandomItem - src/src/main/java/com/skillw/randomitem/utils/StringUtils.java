@@ -66,46 +66,29 @@ public final class StringUtils {
         return PlaceholderAPI.setPlaceholders(player, text);
     }
 
-    public static List<String> interceptRedundantEscaped1(String text) {
+    public static List<String> interceptRedundantEscaped(String text) {
         ArrayList<String> strings = new ArrayList<>();
-        int start = 0, end = 0;
+        int start = -114514, end = 0;
         int count = 0;
         for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '/') {
+            if (text.charAt(i) != '\\') {
+                continue;
+            }
+            if (start == -114514) {
                 if (count == 0) {
                     start = i;
                 }
                 count++;
-            }
-            if (text.charAt(i) == '\\') {
+            } else {
                 count--;
                 if (count == 0) {
                     end = i;
-                    strings.add(text.substring(start, end + 1));
+                    String already = text.substring(start, end + 1);
+                    strings.add(already);
+                    start = -114514;
                 }
             }
-        }
-        return strings;
-    }
 
-    public static List<String> interceptRedundantEscaped2(String text) {
-        ArrayList<String> strings = new ArrayList<>();
-        int start = 0, end = 0;
-        int count = 0;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '\\') {
-                if (count == 0) {
-                    start = i;
-                }
-                count++;
-            }
-            if (text.charAt(i) == '/') {
-                count--;
-                if (count == 0) {
-                    end = i;
-                    strings.add(text.substring(start, end + 1));
-                }
-            }
         }
         return strings;
     }
@@ -118,11 +101,7 @@ public final class StringUtils {
      */
     public static List<String> intercept(String text) {
         ArrayList<String> strings = new ArrayList<>();
-        for (String redundant : interceptRedundantEscaped1(text)) {
-            text = text.replace(redundant, "");
-        }
-        //For the fool...
-        for (String redundant : interceptRedundantEscaped2(text)) {
+        for (String redundant : interceptRedundantEscaped(text)) {
             text = text.replace(redundant, "");
         }
         int start = 0, end = 0;
@@ -150,10 +129,10 @@ public final class StringUtils {
         for (int i = 0; i < chars.length; i++) {
             char c = chars[i];
             if (c == '\\' && chars[i + 1] != 'n') {
-                chars[i] = '/';
+                chars[i] = '&';
             }
         }
-        value = new String(chars).replace("/", "");
+        value = new String(chars).replace("&", "");
         return value;
     }
 }
