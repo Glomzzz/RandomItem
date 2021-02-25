@@ -128,7 +128,7 @@ public final class RandomItemCallable implements Callable<ItemStack> {
                 debugSection(baseSection);
             }
         }
-        if (!alreadySectionMap.isEmpty()) {
+        if (!temp.isEmpty()) {
             if (isDebug()) {
                 sendDebug("&d- &aAlready Sections: &6");
                 this.debugStringsMap(temp);
