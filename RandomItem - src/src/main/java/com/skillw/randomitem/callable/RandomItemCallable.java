@@ -78,6 +78,11 @@ public final class RandomItemCallable implements Callable<ItemStack> {
                 sendDebug("&d  - &f" + lore);
             }
         }
+        if (this.pointData != null) {
+            sendDebug("&d- &aPoint Data: &6" + this.pointData);
+        }
+        //为了效率 我在debug的时候就直接处理这些数据了 为了防止影响输出原先的alreadySectionMap 故声明一个临时变量以储存原先的alreadySectionMap
+        ConcurrentHashMap<String, String> temp = new ConcurrentHashMap<>(alreadySectionMap);
         boolean unbreakable = false;
         if (this.getItemData().getUnbreakableFormula() != null) {
             sendDebug("&d- &aOriginal unbreakable: " + this.getItemData().getUnbreakableFormula());
@@ -95,16 +100,6 @@ public final class RandomItemCallable implements Callable<ItemStack> {
                 sendDebug("&d  - &f" + itemFlag);
                 itemFlag = replaceAll(itemFlag, complexData);
                 itemFlags.set(i, itemFlag);
-            }
-        }
-
-        if (this.pointData != null) {
-            sendDebug("&d- &aPoint Data: &6" + this.pointData);
-        }
-        if (!alreadySectionMap.isEmpty()) {
-            if (isDebug()) {
-                sendDebug("&d- &aAlready Sections: &6");
-                this.debugStringsMap(alreadySectionMap);
             }
         }
         if (this.getItemData().getNbtSection() != null && !this.getItemData().getNbtSection().getKeys(false).isEmpty()) {
@@ -133,7 +128,12 @@ public final class RandomItemCallable implements Callable<ItemStack> {
                 debugSection(baseSection);
             }
         }
-
+        if (!alreadySectionMap.isEmpty()) {
+            if (isDebug()) {
+                sendDebug("&d- &aAlready Sections: &6");
+                this.debugStringsMap(temp);
+            }
+        }
         RandomItemStartGeneratingEvent startEvent = new RandomItemStartGeneratingEvent(this.getItemData().getId(), complexData, enchantmentMap);
         Bukkit.getPluginManager().callEvent(startEvent);
         enchantmentMap = startEvent.getEnchantmentMap();
