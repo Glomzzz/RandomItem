@@ -34,7 +34,7 @@ public class CalculationType extends BaseSectionType {
         if (string != null && !string.isEmpty()) {
             String id = string.split("-")[0];
             string = string.replace(id + "-", "");
-            String[] splits = string.split(",");
+            String[] splits = string.split(",", -1);
             if (splits.length > 0) {
                 String formula = splits[0];
                 String max = splits[1];
