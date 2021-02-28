@@ -1,0 +1,8 @@
+name: ${name}
+main: ${main}
+version: ${version}
+softdepend: [ PlaceholderAPI , MythicMobs ]
+author: Glom_
+lib-download: true
+lib-version: ${libVersion}
+loader-version: ${loaderVersion}
