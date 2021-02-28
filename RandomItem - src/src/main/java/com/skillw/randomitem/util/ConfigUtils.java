@@ -67,7 +67,7 @@ public final class ConfigUtils {
                 sendWrong("Wrong config!");
                 sendWrong("Cause: " + e.getCause());
             }
-            if (config == null || config.getKeys(false).isEmpty()) {
+            if (config.getKeys(false).isEmpty()) {
                 continue;
             }
             addRandomSectionsFromConfigSection(sectionMap, config);
@@ -90,7 +90,7 @@ public final class ConfigUtils {
                 sendWrong("Wrong config!");
                 sendWrong("Cause: " + e.getCause());
             }
-            if (config == null || config.getKeys(false).isEmpty()) {
+            if (config.getKeys(false).isEmpty()) {
                 continue;
             }
             for (String key : config.getKeys(false)) {
