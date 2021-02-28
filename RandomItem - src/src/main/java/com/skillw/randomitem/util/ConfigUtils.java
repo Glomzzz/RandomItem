@@ -22,6 +22,7 @@ import static com.skillw.randomitem.util.FileUtils.getSubFilesFromFile;
 import static com.skillw.randomitem.util.SectionUtils.addRandomSectionsFromConfigSection;
 import static com.skillw.randomitem.util.SectionUtils.cloneBaseSectionMap;
 import static com.skillw.randomitem.util.StringUtils.getMessage;
+import static com.skillw.randomitem.util.StringUtils.messageToText;
 import static io.izzel.taboolib.module.locale.TLocaleLoader.getLocalPriorityFirst;
 
 /**
@@ -51,26 +52,33 @@ public final class ConfigUtils {
         return Main.getInstance().getConfig().getBoolean("options.check-version");
     }
 
+    private static YamlConfiguration loadConfigFile(File file) {
+        if (file == null) {
+            return null;
+        }
+        YamlConfiguration config = new YamlConfiguration();
+        try {
+            config.load(file);
+        } catch (Exception e) {
+            sendWrong("Wrong config!");
+            sendWrong("Cause: " + messageToText(e.getCause().getMessage()));
+        }
+        if (config.getKeys(false).isEmpty()) {
+            return null;
+        }
+        return config;
+    }
+
     public static void loadGlobalSection() {
         GLOBAL_SECTION_MAP.clear();
         ConcurrentHashMap<String, BaseSection> sectionMap = new ConcurrentHashMap<>();
         sendDebug("&aLoading Global Sections:");
         List<File> fileList = getSubFilesFromFile(Main.getInstance().getGlobalSectionsFile());
         for (File file : fileList) {
-            if (file == null) {
-                continue;
+            YamlConfiguration config = loadConfigFile(file);
+            if (config != null) {
+                addRandomSectionsFromConfigSection(sectionMap, config);
             }
-            YamlConfiguration config = new YamlConfiguration();
-            try {
-                config.load(file);
-            } catch (Exception e) {
-                sendWrong("Wrong config!");
-                sendWrong("Cause: " + e.getCause());
-            }
-            if (config.getKeys(false).isEmpty()) {
-                continue;
-            }
-            addRandomSectionsFromConfigSection(sectionMap, config);
         }
         GLOBAL_SECTION_MAP.putAll(sectionMap);
     }
@@ -83,20 +91,13 @@ public final class ConfigUtils {
             if (file == null) {
                 continue;
             }
-            YamlConfiguration config = new YamlConfiguration();
-            try {
-                config.load(file);
-            } catch (Exception e) {
-                sendWrong("Wrong config!");
-                sendWrong("Cause: " + e.getCause());
-            }
-            if (config.getKeys(false).isEmpty()) {
-                continue;
-            }
-            for (String key : config.getKeys(false)) {
-                ConfigurationSection objectSection = config.getConfigurationSection(key);
-                RandomItem randomItem = Main.getRandomItemAPI().createRandomItem(objectSection);
-                randomItem.register();
+            YamlConfiguration config = loadConfigFile(file);
+            if (config != null) {
+                for (String key : config.getKeys(false)) {
+                    ConfigurationSection objectSection = config.getConfigurationSection(key);
+                    RandomItem randomItem = Main.getRandomItemAPI().createRandomItem(objectSection);
+                    randomItem.register();
+                }
             }
         }
     }
