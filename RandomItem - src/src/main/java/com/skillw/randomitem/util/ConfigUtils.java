@@ -231,7 +231,11 @@ public final class ConfigUtils {
     }
 
     private static void send(CommandSender sender, String path, String... args) {
+        if (TLocale.asString(path).isEmpty()) {
+            return;
+        }
         if (!(sender instanceof ConsoleCommandSender)) {
+
             TLocale.sendTo(sender, path, addPrefixAtFirst(args));
         } else {
             TLocale.sendToConsole(path, addPrefixAtFirst(args));
