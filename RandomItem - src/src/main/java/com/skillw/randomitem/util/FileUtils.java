@@ -27,12 +27,9 @@ public final class FileUtils {
             return files;
         }
         for (File subFile : allFiles) {
-            if (!subFile.getName().endsWith(".yml")) {
-                continue;
-            }
             if (subFile.isFile()) {
                 files.add(subFile);
-            } else {
+            } else if (subFile.getName().endsWith(".yml")) {
                 files.addAll(getSubFilesFromFile(subFile));
             }
         }
