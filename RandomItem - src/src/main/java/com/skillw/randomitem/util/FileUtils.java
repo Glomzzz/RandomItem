@@ -27,15 +27,15 @@ public final class FileUtils {
             return files;
         }
         for (File subFile : allFiles) {
-            if (subFile.isFile()) {
+            if (subFile.isFile() && subFile.getName().endsWith(".yml")) {
                 files.add(subFile);
-            } else if (subFile.getName().endsWith(".yml")) {
-                files.addAll(getSubFilesFromFile(subFile));
+                continue;
             }
+            files.addAll(getSubFilesFromFile(subFile));
         }
         return files;
     }
-
+    
     //Form org.bukkit.plugin.java.JavaPlugin
     public static void saveResource(@NotNull String resourcePath, boolean replace) {
         PluginBase plugin = Main.getInstance().getPlugin();
