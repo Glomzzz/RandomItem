@@ -1,8 +1,0 @@
-options:
-  debug: false
-  check-version: true
-command:
-  name: 'randomitem'
-  aliases:
-    - 'ri'
-  permission: 'randomitem.admin'
