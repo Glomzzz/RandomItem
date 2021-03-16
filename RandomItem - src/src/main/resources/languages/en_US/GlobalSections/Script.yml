@@ -1,0 +1,20 @@
+script:
+  type: javascript
+  script: |
+    var id = <quality.data-json>.id;
+    switch(id){
+     case "Rough":
+     return 1;
+     case "Normal":
+     return 2;
+     case "Fine":
+     return 3;
+     case "Excellent":
+     return 4;
+     case "Epic":
+     return 5;
+     case "Legendary":
+     return 6;
+     default:
+     return 0;
+     }
